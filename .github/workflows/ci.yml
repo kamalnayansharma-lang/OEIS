@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test (no external network dependency)
+        run: |
+          PORT=4123 node dist/server.js &
+          SERVER_PID=$!
+          for i in $(seq 1 10); do
+            if curl -sf http://localhost:4123/ -o /dev/null; then break; fi
+            sleep 1
+          done
+
+          echo "--- static UI ---"
+          curl -sf -o /dev/null http://localhost:4123/
+
+          echo "--- POST /api/sequence/process without required fields returns 400 ---"
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:4123/api/sequence/process \
+            -H "Content-Type: application/json" -d '{}')
+          test "$status" = "400"
+
+          echo "--- CORS preflight exposes Access-Control-Allow-Origin ---"
+          curl -s -i -X OPTIONS http://localhost:4123/api/sequence/process \
+            -H "Origin: http://localhost:5500" \
+            -H "Access-Control-Request-Method: POST" \
+            -H "Access-Control-Request-Headers: content-type" | grep -qi "Access-Control-Allow-Origin"
+
+          kill $SERVER_PID
