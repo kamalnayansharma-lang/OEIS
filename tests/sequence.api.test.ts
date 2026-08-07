@@ -82,6 +82,18 @@ describe("POST /api/sequence/process", () => {
     expect(res.body.success).toBe(false);
   });
 
+  it("returns 502 (not 400) when fetchOeisSequence fails", async () => {
+    mockedFetch.mockRejectedValueOnce(new Error("upstream down"));
+
+    const res = await request(app)
+      .post("/api/sequence/process")
+      .send({ sequenceId: "A000055", code: "return 1;" });
+
+    expect(res.status).toBe(502);
+    expect(res.body).toEqual({ success: false, error: "upstream down" });
+    expect(mockedProcess).not.toHaveBeenCalled();
+  });
+
   it("fetches the sequence, runs the user code, and returns the result", async () => {
     const entries = [{ number: 55, data: "1,1,2", name: "Number of trees" }];
     mockedFetch.mockResolvedValueOnce(entries as never);
