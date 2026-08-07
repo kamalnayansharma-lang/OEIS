@@ -9,34 +9,31 @@ Takes a problem statement, runs it through a structured brainstorm, converts the
 
 If the user invoked this without a clear problem statement, ask them for one before proceeding — do not guess the topic of a whole ticket.
 
-## Phase 1: Brainstorm
+## Phase 1: Brainstorm — invoke the real Matt Pocock skill
 
-Adopt the brainstorming style of Matt Pocock:
-- Think from a developer experience (DX) perspective first.
-- Optimize for simplicity before flexibility.
-- Challenge assumptions.
-- Identify edge cases early.
-- Prefer clear APIs over clever implementations.
-- Think in terms of maintainability, scalability, and type safety.
-- Surface hidden complexity.
-- Explore multiple approaches before recommending one.
-- Explicitly call out tradeoffs.
+Don't hand-roll a brainstorming style — invoke it. Call the Skill tool with `skill: mattpocock-skills:grilling` and pass the problem statement as `args`. (Verified not locked: unlike `mattpocock-skills:improve-codebase-architecture`, `grilling`'s SKILL.md carries no `disable-model-invocation` flag, so it's safe to call from here — if a future plugin update ever adds that flag, the Skill tool call will fail with an explicit lock error; stop and tell the user rather than working around it, same as with any other author-locked skill.)
 
-Given the problem statement, produce:
+`grilling` interrogates the idea with the user as a design tree, in rounds — it asks the whole current frontier of questions (each with its own recommended answer), waits for answers, and repeats until the tree is fully resolved and the user confirms shared understanding. Follow its instructions as loaded: dispatch sub-agents yourself for anything answerable by exploring the repo (never ask the user for a fact you could look up), and only put real decisions to them.
 
-**Problem Understanding** — restate the problem, define the desired outcome, list assumptions (make reasonable assumptions and document them; don't ask for clarification unless the problem statement itself is missing).
+Do not move to Phase 2 until the grilling session's frontier is empty and the user has confirmed you've reached a shared understanding — that confirmation is the gate, not a fixed number of rounds.
 
-**User Stories** — primary users, secondary users, key workflows.
+## Phase 1.5: Write up the resolved brainstorm
 
-**Brainstormed Solutions** — at least 5 options, each with: Name, Description, Pros, Cons, Risks, Technical complexity (Low/Medium/High). Ground these in the actual codebase (real file paths, real existing constraints from this project — no auth, no DB, no Redis, no Docker, no Swagger, no caching, no CI/CD were the original constraints, though CI/CD, tests, and lint have since been added; don't silently contradict a constraint that's still in force without flagging the tension explicitly).
+Once grilling concludes, synthesize its resolved decisions (not a fresh guess) into this structured record, so there's a durable artifact beyond the back-and-forth transcript:
 
-**Edge Cases** — all major edge cases.
+**Problem Understanding** — restate the problem, the desired outcome, and the assumptions that were settled during grilling (not invented after the fact).
+
+**User Stories** — primary users, secondary users, key workflows, as they came out of the interrogation.
+
+**Brainstormed Solutions** — the options actually discussed (or, if grilling converged on one path directly, the alternatives that were considered and ruled out along the way), each with: Name, Description, Pros, Cons, Risks, Technical complexity (Low/Medium/High). Ground these in the actual codebase (real file paths, real existing constraints from this project — no auth, no DB, no Redis, no Docker, no Swagger, no caching, no CI/CD were the original constraints, though CI/CD, tests, and lint have since been added; don't silently contradict a constraint that's still in force without flagging the tension explicitly).
+
+**Edge Cases** — every edge case that surfaced during grilling.
 
 **Technical Considerations** — architecture, APIs, data flow, security, performance, monitoring, testing.
 
-**Recommendation** — pick the best approach and justify it, explicitly naming the tradeoff being made.
+**Recommendation** — the path the user actually settled on, and why, explicitly naming the tradeoff being made.
 
-Show this Phase 1 output to the user before moving to Phase 2, unless they've explicitly asked you to skip straight to filing the ticket.
+Show this write-up to the user before moving to Phase 2, unless they've explicitly asked you to skip straight to filing the ticket.
 
 ## Phase 2: Convert to a GitHub ticket
 
