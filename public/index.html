@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OEIS Sequence Explorer</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>OEIS Sequence Explorer</h1>
+      <p class="subtitle">Fetch an OEIS sequence and run your own code against it.</p>
+    </header>
+
+    <section class="card">
+      <label for="sequenceId">Sequence ID</label>
+      <div class="row">
+        <input id="sequenceId" type="text" placeholder="e.g. A000055" value="A000055" />
+        <button id="fetchBtn">Fetch Sequence</button>
+      </div>
+    </section>
+
+    <section id="sequenceCard" class="card hidden">
+      <div class="card-header">
+        <h2 id="seqName">—</h2>
+        <span id="seqId" class="badge"></span>
+      </div>
+      <div class="meta-grid" id="seqMeta"></div>
+
+      <h3>Terms</h3>
+      <div id="seqTerms" class="terms"></div>
+
+      <div id="seqExtras"></div>
+    </section>
+
+    <section class="card">
+      <label for="code">
+        Your Code
+        <span class="hint">(JS body — use <code>return</code> and the <code>oeisData</code> array)</span>
+      </label>
+      <textarea id="code" rows="6">return oeisData[0].name;</textarea>
+      <div class="row">
+        <button id="processBtn">Run Process API</button>
+        <span id="processStatus" class="status"></span>
+      </div>
+    </section>
+
+    <section id="resultCard" class="card hidden">
+      <h3>Result</h3>
+      <pre id="resultBox"></pre>
+    </section>
+
+    <section id="errorCard" class="card error hidden">
+      <h3>Error</h3>
+      <pre id="errorBox"></pre>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
