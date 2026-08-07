@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report something broken in the OEIS backend or UI
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does this happen?
+      options:
+        - GET /api/sequence/:id
+        - POST /api/sequence/process
+        - Web UI (public/)
+        - Build / lint / tests
+        - CI pipeline
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include request bodies, sequence IDs, or code snippets used.
+      placeholder: |
+        1. POST /api/sequence/process with { "sequenceId": "A000055", "code": "..." }
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the response body, status code, or stack trace if available.
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: e.g. v20.14.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+    validations:
+      required: false
